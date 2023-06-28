@@ -1,0 +1,81 @@
+const mysql = require('mysql');
+
+const customers = [
+  {
+    email: "anurag11@yopmail.com",
+    name: "anurag"
+  },
+  {
+    email: "sameer11@yopmail.com",
+    name: "sameer"
+  },
+  {
+    email: "ravi11@yopmail.com",
+    name: "ravi"
+  },
+  {
+    email: "akash11@yopmail.com",
+    name: "akash"
+  },
+  {
+    email: "anjali11@yopmail.com",
+    name: "anjali"
+  },
+  {
+    email: "santosh11@yopmail.com",
+    name: "santosh"
+  }
+];
+
+// Create MySQL connection
+const db = mysql.createConnection({
+  host: 'localhost',
+  user: 'your_username',
+  password: 'your_password',
+  database: 'your_database'
+});
+
+// Connect to the database
+db.connect((err) => {
+  if (err) {
+    console.error('Error connecting to MySQL:', err);
+    return;
+  }
+  console.log('Connected to MySQL database');
+
+  // Insert or update customers
+  customers.forEach((customer) => {
+    const { email, name } = customer;
+
+    // Check if the email already exists
+    db.query('SELECT * FROM customers WHERE email = ?', [email], (err, results) => {
+      if (err) {
+        console.error('Error checking for existing email:', err);
+        return;
+      }
+
+      if (results.length > 0) {
+        // Update the customer's name if email already exists
+        db.query('UPDATE customers SET name = ? WHERE email = ?', [name, email], (err, result) => {
+          if (err) {
+            console.error('Error updating customer:', err);
+            return;
+          }
+          console.log('Customer updated:', email, name);
+        });
+      } else {
+        // Insert the new customer
+        db.query('INSERT INTO customers (name, email) VALUES (?, ?)', [name, email], (err, result) => {
+          if (err) {
+            console.error('Error inserting customer:', err);
+            return;
+          }
+          console.log('Customer inserted:', email, name);
+        });
+      }
+    });
+  });
+});
+
+// Close the database connection
+db.end();
