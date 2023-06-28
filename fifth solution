@@ -1,0 +1,34 @@
+// 5th question solution
+const request = require('request')
+
+function promisify(harish) {
+  return new Promise((resolve, reject) => {
+    harish((error, result) => {
+      if (error) {
+        reject(error)
+      } else {
+        resolve(result)
+      }
+    })
+  })
+}
+
+function getGoogleHomePage() {
+  return promisify(finalCallBack => {
+    request('http://www.google.com', function (error, response, body) {
+      console.error('error:', error)
+      finalCallBack(error)
+      console.log('statusCode:', response && response.statusCode)
+      console.log('body:', body)
+      finalCallBack(null, body)
+    })
+  })
+}
+
+getGoogleHomePage()
+  .then(result => {
+    console.log('RESULT==>', result)
+  })
+  .catch(error => {
+    console.error('ERROR==>', error)
+  })
